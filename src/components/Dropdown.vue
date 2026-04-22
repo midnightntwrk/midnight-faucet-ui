@@ -189,6 +189,14 @@ const statusLabel: Record<Status, string> = {
 
 <template>
   <div ref="root" class="dropdown">
+    <p
+      v-if="currentStatus === 'unreachable' && currentFailure"
+      class="failure-message"
+      role="status"
+      aria-live="polite"
+    >
+      {{ currentFailure }}
+    </p>
     <button
       :id="triggerId"
       type="button"
@@ -227,14 +235,6 @@ const statusLabel: Record<Status, string> = {
         </span>
       </li>
     </ul>
-
-    <p
-      v-if="currentStatus === 'unreachable' && currentFailure"
-      class="failure-message"
-      role="status"
-    >
-      {{ currentFailure }}
-    </p>
   </div>
 </template>
 
