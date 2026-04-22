@@ -1,8 +1,29 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import axios, { isAxiosError } from "axios";
 import { ROUTES } from "../router/routes";
-import type { Network } from "../constants";
+import { TURNSTILE_SITE_KEY, TURNSTILE_TEST_SITE_KEY, type Network } from "../constants";
+
+type TurnstileRenderOptions = {
+  sitekey: string;
+  callback?: (token: string) => void;
+  "error-callback"?: () => void;
+  "expired-callback"?: () => void;
+};
+
+type TurnstileApi = {
+  render: (container: HTMLElement, options: TurnstileRenderOptions) => string;
+  reset: (widgetId?: string) => void;
+  remove: (widgetId?: string) => void;
+};
+
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+  }
+}
+
+const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js";
 
 const props = defineProps<{ network: Network }>();
 
@@ -26,9 +47,36 @@ const transactionHash = ref<string | null>(null);
 
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 const POLL_INTERVAL_MS = 2000;
-// TODO: replace with amount input + Cloudflare Turnstile token once those land.
+// TODO: replace with amount input once that lands.
 const AMOUNT = "1000";
-const CAPTCHA_TOKEN_STUB = "XXXX.DUMMY.TOKEN.XXXX";
+
+const captchaToken = ref("");
+const turnstileContainer = ref<HTMLDivElement | null>(null);
+let turnstileWidgetId: string | null = null;
+let turnstileScript: HTMLScriptElement | null = null;
+
+const resetTurnstile = () => {
+  captchaToken.value = "";
+  if (window.turnstile && turnstileWidgetId !== null) {
+    window.turnstile.reset(turnstileWidgetId);
+  }
+};
+
+const renderTurnstile = () => {
+  if (!window.turnstile || !turnstileContainer.value || turnstileWidgetId !== null) return;
+  turnstileWidgetId = window.turnstile.render(turnstileContainer.value, {
+    sitekey: TURNSTILE_SITE_KEY || TURNSTILE_TEST_SITE_KEY,
+    callback: (token) => {
+      captchaToken.value = token;
+    },
+    "error-callback": () => {
+      captchaToken.value = "";
+    },
+    "expired-callback": () => {
+      captchaToken.value = "";
+    },
+  });
+};
 
 const clearPoll = () => {
   if (pollTimer) {
@@ -74,6 +122,10 @@ const requestDrip = async () => {
     errorMessage.value = "address is required";
     return;
   }
+  if (!captchaToken.value) {
+    errorMessage.value = "please complete the captcha";
+    return;
+  }
   submitting.value = true;
   dripId.value = null;
   dripStatus.value = null;
@@ -88,7 +140,7 @@ const requestDrip = async () => {
       {
         headers: {
           "Content-Type": "application/json",
-          "X-Captcha-Token": CAPTCHA_TOKEN_STUB,
+          "X-Captcha-Token": captchaToken.value,
         },
       },
     );
@@ -124,7 +176,41 @@ const statusMessage = computed(() => {
   return null;
 });
 
-onBeforeUnmount(clearPoll);
+onMounted(() => {
+  const existing = document.querySelector<HTMLScriptElement>(
+    `script[src="${TURNSTILE_SCRIPT_SRC}"]`,
+  );
+  if (existing) {
+    if (window.turnstile) renderTurnstile();
+    else existing.addEventListener("load", renderTurnstile, { once: true });
+    return;
+  }
+  const script = document.createElement("script");
+  script.src = TURNSTILE_SCRIPT_SRC;
+  script.async = true;
+  script.defer = true;
+  script.addEventListener("load", renderTurnstile, { once: true });
+  document.body.appendChild(script);
+  turnstileScript = script;
+});
+
+watch([dripStatus, errorMessage], ([status, error]) => {
+  if (status === "CONFIRMED" || status === "FAILED" || error) {
+    resetTurnstile();
+  }
+});
+
+onBeforeUnmount(() => {
+  clearPoll();
+  if (window.turnstile && turnstileWidgetId !== null) {
+    window.turnstile.remove(turnstileWidgetId);
+    turnstileWidgetId = null;
+  }
+  if (turnstileScript && turnstileScript.parentNode) {
+    turnstileScript.parentNode.removeChild(turnstileScript);
+    turnstileScript = null;
+  }
+});
 </script>
 
 <template>
@@ -138,10 +224,17 @@ onBeforeUnmount(clearPoll);
       spellcheck="false"
       :disabled="submitting"
     />
-    <button type="submit" class="request-button" :disabled="submitting">
+    <button
+      type="submit"
+      class="request-button"
+      :disabled="submitting || !captchaToken"
+    >
       {{ submitting ? "requesting…" : "request" }}
     </button>
+    <div ref="turnstileContainer" class="turnstile-container"></div>
     <p v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</p>
     <p v-else-if="statusMessage" class="status-message" role="status">{{ statusMessage }}</p>
   </form>
 </template>
+
+<style scoped src="./styles/input.css"></style>
