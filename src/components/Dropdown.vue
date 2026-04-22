@@ -80,33 +80,25 @@ const buildFailureMessage = (
   return parts.length > 0 ? parts.join(" — ") : null;
 };
 
-const pingNetwork = async (n: Network) => {
+const checkNetwork = async (n: Network) => {
   controllers.get(n)?.abort();
   const controller = new AbortController();
   controllers.set(n, controller);
   status[n] = "checking";
   failureMessage[n] = null;
 
-  console.log("controller signal", controller, controller.signal);
   const [health, ready] = await Promise.all([
     probeEndpoint<HealthResponse>(
       ROUTES.getHealth({ chain: n }),
       controller.signal,
-      (b) => {
-        console.log("B", b);
-        return b.status === "SERVING";
-      },
+      (health) => health.status === "SERVING",
     ),
     probeEndpoint<ReadyResponse>(
       ROUTES.getReady({ chain: n }),
       controller.signal,
-      (b) => {
-        console.log("B2", b);
-        return b.status === "ok";
-      },
+      (health) => health.status === "ok",
     ),
   ]);
-  console.log("health and ready:", health, ready);
 
   if (controller.signal.aborted) return;
   const healthy = health.kind === "ok" && ready.kind === "ok";
@@ -173,13 +165,13 @@ const activeOptionId = computed(() => {
 watch(
   () => props.modelValue,
   (n) => {
-    void pingNetwork(n);
+    void checkNetwork(n);
   },
 );
 
 onMounted(() => {
   document.addEventListener("mousedown", onDocumentMouseDown);
-  void pingNetwork(props.modelValue);
+  void checkNetwork(props.modelValue);
 });
 
 onBeforeUnmount(() => {
