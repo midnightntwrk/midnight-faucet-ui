@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import axios from "axios";
 import { OPTIONS, type Network, type Status } from "../constants";
 import { ROUTES, type HealthResponse, type ReadyResponse } from "../router/routes";
 
@@ -42,15 +43,12 @@ const probeEndpoint = async <T,>(
   isHealthy: (body: T) => boolean,
 ): Promise<ProbeResult<T>> => {
   try {
-    const res = await fetch(url, {
-      method: "GET",
-      mode: "cors",
-      cache: "no-store",
-      headers: { Accept: "application/json" },
+    const { data } = await axios.get<T>(url, {
       signal,
+      headers: { Accept: "application/json" },
+      validateStatus: () => true,
     });
-    const body = (await res.json()) as T;
-    return isHealthy(body) ? { kind: "ok", body } : { kind: "unhealthy", body };
+    return isHealthy(data) ? { kind: "ok", body: data } : { kind: "unhealthy", body: data };
   } catch {
     return { kind: "unreachable" };
   }
@@ -91,12 +89,12 @@ const checkNetwork = async (n: Network) => {
     probeEndpoint<HealthResponse>(
       ROUTES.getHealth({ chain: n }),
       controller.signal,
-      (health) => health.status === "SERVING",
+      (health: HealthResponse) => health.status === "SERVING",
     ),
     probeEndpoint<ReadyResponse>(
       ROUTES.getReady({ chain: n }),
       controller.signal,
-      (health) => health.status === "ok",
+      (health: ReadyResponse) => health.status === "ok",
     ),
   ]);
 

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import Dropdown from './components/Dropdown.vue'
+import { ref } from "vue";
+import Dropdown from "./components/Dropdown.vue";
+import Input from "./components/Input.vue";
 
-type Network = 'devnet' | 'qanet' | 'preview' | 'preprod'
-const network = ref<Network>('devnet')
+type Network = "devnet" | "qanet" | "preview" | "preprod";
+const network = ref<Network>("devnet");
 </script>
 
 <template>
@@ -13,6 +14,7 @@ const network = ref<Network>('devnet')
 
   <main>
     <Dropdown v-model="network" />
+    <Input :network="network" />
   </main>
 </template>
 
