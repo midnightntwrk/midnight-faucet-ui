@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import axios, { isAxiosError } from "axios";
-import { ROUTES } from "../router/routes";
+import { ROUTES, type HealthResponse } from "../router/routes";
 import { TURNSTILE_SITE_KEY, TURNSTILE_TEST_SITE_KEY, type Network } from "../constants";
 
 type TurnstileRenderOptions = {
@@ -39,6 +39,7 @@ interface DripResponse {
 const address = ref("");
 const errorMessage = ref<string | null>(null);
 const submitting = ref(false);
+const serviceAvailable = ref(false);
 
 const dripId = ref<string | null>(null);
 const dripStatus = ref<DripStatus | null>(null);
@@ -49,6 +50,14 @@ let pollTimer: ReturnType<typeof setInterval> | null = null;
 const POLL_INTERVAL_MS = 2000;
 // TODO: replace with amount input once that lands.
 const AMOUNT = "1000";
+
+const isTesting =
+  typeof window !== "undefined" &&
+  new URLSearchParams(window.location.search).get("isTesting") === "true";
+
+const turnstileSiteKey = isTesting
+  ? TURNSTILE_TEST_SITE_KEY
+  : TURNSTILE_SITE_KEY || TURNSTILE_TEST_SITE_KEY;
 
 const captchaToken = ref("");
 const turnstileContainer = ref<HTMLDivElement | null>(null);
@@ -65,7 +74,7 @@ const resetTurnstile = () => {
 const renderTurnstile = () => {
   if (!window.turnstile || !turnstileContainer.value || turnstileWidgetId !== null) return;
   turnstileWidgetId = window.turnstile.render(turnstileContainer.value, {
-    sitekey: TURNSTILE_SITE_KEY || TURNSTILE_TEST_SITE_KEY,
+    sitekey: turnstileSiteKey,
     callback: (token) => {
       captchaToken.value = token;
     },
@@ -114,6 +123,26 @@ const startPolling = (id: string) => {
   clearPoll();
   pollTimer = setInterval(() => void pollDrip(id), POLL_INTERVAL_MS);
 };
+
+const checkHealth = async () => {
+  try {
+    const { data } = await axios.get<HealthResponse>(
+      ROUTES.getHealth({ chain: props.network }),
+      { headers: { Accept: "application/json" } },
+    );
+    serviceAvailable.value = data.status === "SERVING";
+  } catch {
+    serviceAvailable.value = false;
+  }
+};
+
+const canSubmit = computed(
+  () =>
+    !submitting.value &&
+    !!captchaToken.value &&
+    address.value.trim().length > 0 &&
+    serviceAvailable.value,
+);
 
 const requestDrip = async () => {
   errorMessage.value = null;
@@ -168,15 +197,16 @@ const requestDrip = async () => {
 const statusMessage = computed(() => {
   if (errorMessage.value) return null;
   if (dripStatus.value === "PENDING") {
-    return taskStatus.value ? `pending — ${taskStatus.value}` : "pending…";
+    return taskStatus.value ? `submitting — ${taskStatus.value}` : "submitting...";
   }
   if (dripStatus.value === "CONFIRMED") {
-    return transactionHash.value ? `confirmed — ${transactionHash.value}` : "confirmed";
+    return transactionHash.value ? `confirmed — ${transactionHash.value}` : "the tokens should be in your wallet.";
   }
   return null;
 });
 
 onMounted(() => {
+  void checkHealth();
   const existing = document.querySelector<HTMLScriptElement>(
     `script[src="${TURNSTILE_SCRIPT_SRC}"]`,
   );
@@ -200,6 +230,14 @@ watch([dripStatus, errorMessage], ([status, error]) => {
   }
 });
 
+watch(
+  () => props.network,
+  () => {
+    serviceAvailable.value = false;
+    void checkHealth();
+  },
+);
+
 onBeforeUnmount(() => {
   clearPoll();
   if (window.turnstile && turnstileWidgetId !== null) {
@@ -219,21 +257,22 @@ onBeforeUnmount(() => {
       v-model="address"
       class="input"
       type="text"
-      placeholder="recipient address"
+      placeholder="unshielded address"
       autocomplete="off"
       spellcheck="false"
       :disabled="submitting"
     />
+    <p v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</p>
+    <p v-else-if="statusMessage" class="status-message" role="status">{{ statusMessage }}</p>
     <button
       type="submit"
       class="request-button"
-      :disabled="submitting || !captchaToken"
+      :disabled="!canSubmit"
     >
       {{ submitting ? "requesting…" : "request" }}
     </button>
     <div ref="turnstileContainer" class="turnstile-container"></div>
-    <p v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</p>
-    <p v-else-if="statusMessage" class="status-message" role="status">{{ statusMessage }}</p>
+   
   </form>
 </template>
 
