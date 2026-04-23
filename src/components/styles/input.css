@@ -69,21 +69,46 @@
 
 .error-message {
   margin: 0;
-  padding: 0.5rem 0.75rem;
+  padding: 0;
   font-size: 0.8rem;
   color: var(--color-danger);
-  border: 1px solid var(--color-border);
-  border-radius: 3px;
   line-height: 1.4;
 }
 
 .status-message {
   margin: 0;
-  padding: 0.5rem 0.75rem;
+  padding: 0;
   font-size: 0.8rem;
   color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  border-radius: 3px;
   line-height: 1.4;
   word-break: break-all;
+}
+
+:root[data-theme="light"] .status-message {
+  color: var(--color-text);
+}
+
+.explorer-link {
+  margin: 0;
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--color-accent);
+  line-height: 1.4;
+  word-break: break-all;
+  text-decoration: underline;
+}
+
+.explorer-link:hover,
+.explorer-link:focus-visible {
+  color: var(--color-accent-hover);
+  outline: none;
+}
+
+:root[data-theme="light"] .explorer-link {
+  color: #0369a1;
+}
+
+:root[data-theme="light"] .explorer-link:hover,
+:root[data-theme="light"] .explorer-link:focus-visible {
+  color: #075985;
 }

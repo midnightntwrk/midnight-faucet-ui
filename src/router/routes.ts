@@ -6,6 +6,8 @@ export const ROUTES = {
   postDrip: ({ chain }: { chain: Network }) => `${NETWORKS[chain]}api/drips`,
   getDripStatus: ({ chain, dripId }: { chain: Network; dripId: string }) =>
     `${NETWORKS[chain]}api/drips/${dripId}`,
+  getExplorerLink: ({ chain, txId }: { chain: Network; txId: string | null }) =>
+    `https://${chain}.midnightexplorer.com/transactions/${txId}`,
 };
 
 export type HealthResponse =

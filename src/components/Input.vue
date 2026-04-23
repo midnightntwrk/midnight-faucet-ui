@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch, link} from "vue";
 import axios, { isAxiosError } from "axios";
 import { ROUTES, type HealthResponse } from "../router/routes";
 import { TURNSTILE_SITE_KEY, TURNSTILE_TEST_SITE_KEY, type Network } from "../constants";
@@ -197,10 +197,10 @@ const requestDrip = async () => {
 const statusMessage = computed(() => {
   if (errorMessage.value) return null;
   if (dripStatus.value === "PENDING") {
-    return taskStatus.value ? `submitting — ${taskStatus.value}` : "submitting...";
+    return taskStatus.value ? `submitting — it will take a few seconds` : "submitting...";
   }
   if (dripStatus.value === "CONFIRMED") {
-    return transactionHash.value ? `confirmed — ${transactionHash.value}` : "the tokens should be in your wallet.";
+    return transactionHash.value ? `confirmed — your tokens should be in your wallet` : `confirmed`;
   }
   return null;
 });
@@ -249,6 +249,8 @@ onBeforeUnmount(() => {
     turnstileScript = null;
   }
 });
+
+// const getExplorerLink = () =>  ROUTES.getExplorerLink({ chain: props.network, txId: transactionHash.value });
 </script>
 
 <template>
@@ -264,6 +266,15 @@ onBeforeUnmount(() => {
     />
     <p v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</p>
     <p v-else-if="statusMessage" class="status-message" role="status">{{ statusMessage }}</p>
+    <a
+      v-if="dripStatus === 'CONFIRMED' && transactionHash"
+      class="explorer-link"
+      :href="ROUTES.getExplorerLink({ chain: props.network, txId: transactionHash })"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      View your transaction
+    </a>     
     <button
       type="submit"
       class="request-button"
