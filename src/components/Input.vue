@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch, link} from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import axios, { isAxiosError } from "axios";
 import { ROUTES, type HealthResponse } from "../router/routes";
 import { TURNSTILE_SITE_KEY, TURNSTILE_TEST_SITE_KEY, type Network } from "../constants";
@@ -48,7 +48,6 @@ const transactionHash = ref<string | null>(null);
 
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 const POLL_INTERVAL_MS = 2000;
-// TODO: replace with amount input once that lands.
 const AMOUNT = "1000";
 
 const isTesting =
@@ -250,7 +249,6 @@ onBeforeUnmount(() => {
   }
 });
 
-// const getExplorerLink = () =>  ROUTES.getExplorerLink({ chain: props.network, txId: transactionHash.value });
 </script>
 
 <template>
