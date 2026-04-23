@@ -113,7 +113,7 @@
 }
 
 .option[data-active="true"] {
-  background: #141414;
+  background: var(--color-surface-active);
   color: var(--color-text);
 }
 

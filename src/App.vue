@@ -3,6 +3,7 @@ import { onMounted, ref, watchEffect } from "vue";
 import Dropdown from "./components/Dropdown.vue";
 import Input from "./components/Input.vue";
 import type { Network } from "./constants";
+import midnightLogo from "./assets/midnight-logo.png";
 
 type Theme = "dark" | "light";
 
@@ -31,7 +32,10 @@ const toggleTheme = () => {
 <template>
   <div class="app-shell">
     <header class="app-header">
-      <h1 class="app-title">midnight</h1>
+      <img :src="midnightLogo" alt="midnight" class="app-logo" />
+      <p class="app-tagline">First fourth generation blockchain.
+
+</p>
     </header>
 
     <main class="app-main">
@@ -64,16 +68,33 @@ const toggleTheme = () => {
 }
 
 .app-header {
-  flex: 0 0 auto;
+  flex: 1 1 320px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
-.app-title {
-  font-size: 3rem;
-  font-weight: 300;
-  letter-spacing: 0.08em;
-  color: var(--color-text);
+.app-logo {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+}
+
+:root[data-theme="light"] .app-logo {
+  filter: invert(1);
+}
+
+.app-tagline {
+  margin: 0;
+  padding-left: 0.15rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
   text-transform: lowercase;
-  line-height: 1;
+  color: var(--color-text-muted);
 }
 
 .app-main {
@@ -125,8 +146,13 @@ const toggleTheme = () => {
     gap: 2rem;
   }
 
-  .app-title {
-    font-size: 2.25rem;
+  .app-header {
+    align-items: center;
+    text-align: center;
+  }
+
+  .app-logo {
+    max-width: 240px;
   }
 }
 </style>

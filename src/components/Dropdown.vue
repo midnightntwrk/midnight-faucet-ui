@@ -17,6 +17,7 @@ const listboxId = "dropdown-listbox";
 const optionId = (n: Network) => `dropdown-option-${n}`;
 
 const status = reactive<Record<Network, Status>>({
+  local: "idle",
   devnet: "idle",
   qanet: "idle",
   preview: "idle",
@@ -31,6 +32,7 @@ type ProbeResult<T> =
   | { kind: "unreachable" };
 
 const failureMessage = reactive<Record<Network, string | null>>({
+  local: null,
   devnet: null,
   qanet: null,
   preview: null,
@@ -42,6 +44,7 @@ const probeEndpoint = async <T,>(
   signal: AbortSignal,
   isHealthy: (body: T) => boolean,
 ): Promise<ProbeResult<T>> => {
+  console.log("URL: ", url);
   try {
     const { data } = await axios.get<T>(url, {
       signal,
