@@ -44,7 +44,6 @@ const probeEndpoint = async <T,>(
   signal: AbortSignal,
   isHealthy: (body: T) => boolean,
 ): Promise<ProbeResult<T>> => {
-  console.log("URL: ", url);
   try {
     const { data } = await axios.get<T>(url, {
       signal,
