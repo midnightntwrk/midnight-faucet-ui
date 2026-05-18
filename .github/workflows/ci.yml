@@ -29,13 +29,13 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f #v6.3.0
         with:
           node-version: '20'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: npm install --immutable
 
       - name: Run ESLint
-        run: yarn lint
+        run: npm run lint
 
   test:
     name: Test
@@ -51,13 +51,13 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f #v6.3.0
         with:
           node-version: '20'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: npm install --immutable
 
       - name: Run tests with coverage
-        run: yarn test:coverage --run
+        run: npm run test:unit -- --run --coverage
 
       - name: Coverage report
         uses: davelosert/vitest-coverage-report-action@3c50566c523e04813df28de8f7c48dd97d663f1c #v2.11.2
@@ -88,27 +88,25 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f #v6.3.0
         with:
           node-version: '20'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: npm install --immutable
 
       - name: Build application
-        run: yarn build
+        run: npm run build
         env:
           VITE_IS_LOCAL_BUILD: false
 
       - name: Verify build output
         run: |
           echo "Build output contents:"
-          ls -la .next/ || echo "ERROR: .next directory not found!"
-          ls -la .next/standalone/ || echo "ERROR: .next/standalone directory not found!"
+          ls -la dist/ || echo "ERROR: dist directory not found!"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f #v7.0.0
         with:
           name: build
-          path: .next
+          path: dist
           retention-days: 7
           if-no-files-found: error
-          include-hidden-files: true
