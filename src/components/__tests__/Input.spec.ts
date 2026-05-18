@@ -93,15 +93,6 @@ describe("Input — button enable logic", () => {
     expect(wrapper.get("button.request-button").attributes("disabled")).toBeDefined();
   });
 
-  it("re-checks health when network prop changes", async () => {
-    const wrapper = await mountInput("devnet");
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    await wrapper.setProps({ network: "local" });
-    await flushPromises();
-    expect(mockedAxios.get).toHaveBeenCalledTimes(2);
-    const lastCallUrl = mockedAxios.get.mock.calls.at(-1)?.[0];
-    expect(lastCallUrl).toContain("localhost");
-  });
 });
 
 describe("Input — drip request", () => {

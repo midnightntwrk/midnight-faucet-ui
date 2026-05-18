@@ -9,4 +9,7 @@ export const NETWORKS: Record<Network, string> = {
   preprod: "https://faucet.preprod.midnight.network/",
 };
 
-export const OPTIONS: Network[] = ["local", "devnet", "qanet", "preview", "preprod"];
+const allOptions: Network[] = ["local", "devnet", "qanet", "preview", "preprod"];
+export const OPTIONS: Network[] = import.meta.env.VITE_IS_LOCAL_BUILD === "true"
+  ? allOptions
+  : allOptions.filter((n) => n !== "local");
