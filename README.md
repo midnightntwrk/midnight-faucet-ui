@@ -72,6 +72,39 @@ npm run test:e2e -- --debug
 npm run lint
 ```
 
+## Release Process
+
+This project uses [semantic-release](https://semantic-release.gitbook.io/) for automated versioning and releases.
+
+### How Releases Work
+
+Releases are automatically created when commits matching the [Conventional Commits](https://www.conventionalcommits.org/) format are pushed to the `main` branch. The CI workflow must pass for the release workflow to trigger.
+
+**Release workflow:**
+1. Push commits to `main` with conventional commit messages
+2. CI workflow runs and passes
+3. Release workflow automatically analyzes commits and creates a GitHub release if applicable
+
+### Commit Message Format
+
+Commit messages must follow the Conventional Commits specification to trigger a release:
+
+- `feat: description` — Creates a minor version bump (feature release)
+- `fix: description` — Creates a patch version bump (bug fix release)
+- `feat!: description` or `fix!: description` — Creates a major version bump (breaking change)
+- `chore:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:` — No release triggered
+
+**Examples:**
+```
+feat: add network dropdown component
+fix: correct API timeout handling
+feat!: change authentication mechanism (BREAKING CHANGE)
+```
+
+### First Release
+
+For the first release, create a commit with a conventional commit message (e.g., `feat: initial release`) and push to `main`. semantic-release will analyze all commits since the repository's start and create the first release.
+
 # Midnight Template Repository
 
 This GitHub repository should be used as a template when creating a new Midnight GitHub repository.
