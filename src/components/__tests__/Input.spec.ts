@@ -4,19 +4,18 @@ import axios from "axios";
 import Input from "../Input.vue";
 
 vi.mock("axios", () => {
-  const get = vi.fn();
-  const post = vi.fn();
+  const get = vi.fn<() => Promise<{ data: { status: string; reason: string | null } }>>();
+  const post = vi.fn<(url: string, data: { recipientAddress: string; amount: string }, config: { headers: Record<string, string> }) => Promise<{ data: { dripId: string; status: string; taskStatus: null; transactionHash: string; error: null } }>>();
   const isAxiosError = (e: unknown): boolean =>
     typeof e === "object" && e !== null && "isAxiosError" in e;
   return { default: { get, post, isAxiosError }, isAxiosError };
 });
 
-type AxiosMock = {
+const mockedAxios = axios as unknown as {
   get: ReturnType<typeof vi.fn>;
   post: ReturnType<typeof vi.fn>;
   isAxiosError: (e: unknown) => boolean;
 };
-const mockedAxios = axios as unknown as AxiosMock;
 
 const FAKE_TOKEN = "fake-turnstile-token";
 
@@ -24,14 +23,14 @@ const FAKE_TOKEN = "fake-turnstile-token";
 // with a fake token so captchaToken populates on mount.
 const installTurnstile = (opts: { immediateSuccess?: boolean } = {}) => {
   const { immediateSuccess = true } = opts;
-  const render = vi.fn((_el: HTMLElement, params: { callback?: (t: string) => void }) => {
+  const render = vi.fn<(_el: HTMLElement, params: { callback?: (t: string) => void }) => string>((_el: HTMLElement, params: { callback?: (t: string) => void }) => {
     if (immediateSuccess && params.callback) params.callback(FAKE_TOKEN);
     return "widget-id";
   });
   (window as unknown as { turnstile: unknown }).turnstile = {
     render,
-    reset: vi.fn(),
-    remove: vi.fn(),
+    reset: vi.fn<() => void>(),
+    remove: vi.fn<(id: string) => void>(),
   };
   return render;
 };
