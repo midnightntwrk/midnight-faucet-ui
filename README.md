@@ -124,8 +124,6 @@ All repositories are scanned with Checkmarx's suite of tools including: Static A
 
 Facilitates two-way data synchronization, automated workflows and streamline processes between: Jira, GitHub issues and Github project Kanban board.
 
-# TODO - New Repo Owner
-
 ### Software Package Data Exchange (SPDX)
 Include the following Software Package Data Exchange (SPDX) short-form identifier in a comment at the top headers of each source code file.
 
