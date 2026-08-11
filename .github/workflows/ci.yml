@@ -95,3 +95,45 @@ jobs:
           path: dist
           retention-days: 7
           if-no-files-found: error
+
+  e2e:
+    name: End-to-end
+    runs-on: ubuntu-latest
+    needs: [test]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 #v7.0.0
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Update NPM
+        run: npm install -g npm@12.0.2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      # Playwright serves this build from `npm run preview` on port 4173.
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_IS_LOCAL_BUILD: false
+
+      - name: Run end-to-end tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

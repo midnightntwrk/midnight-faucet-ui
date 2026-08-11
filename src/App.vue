@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from "vue";
+import { ref, watchEffect } from "vue";
 import Dropdown from "./components/Dropdown.vue";
 import Input from "./components/Input.vue";
 import type { Network } from "./constants";
@@ -7,15 +7,18 @@ import midnightLogo from "./assets/midnight-logo.png";
 
 type Theme = "dark" | "light";
 
-const network = ref<Network>("devnet");
-const theme = ref<Theme>("dark");
-
 const THEME_STORAGE_KEY = "midnight.theme";
+const DEFAULT_THEME: Theme = "dark";
 
-onMounted(() => {
-  const stored = localStorage.getItem(THEME_STORAGE_KEY);
-  if (stored === "light" || stored === "dark") theme.value = stored;
-});
+// Read the stored preference up front: the effect below persists the theme as soon
+// as it runs, so anything read after setup would already have been overwritten.
+const storedTheme = (): Theme => {
+  const stored = typeof localStorage === "undefined" ? null : localStorage.getItem(THEME_STORAGE_KEY);
+  return stored === "light" || stored === "dark" ? stored : DEFAULT_THEME;
+};
+
+const network = ref<Network>("devnet");
+const theme = ref<Theme>(storedTheme());
 
 watchEffect(() => {
   document.documentElement.setAttribute("data-theme", theme.value);

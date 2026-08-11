@@ -28,19 +28,17 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [['list'], ['html', { open: 'never' }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173',
+    /* Base URL to use in actions like `await page.goto('/')`. The dev server port
+     * comes from vite.config.ts; the preview server uses vite's default. */
+    baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-
-    /* Only on CI systems run the tests headless */
-    headless: !!process.env.CI,
   },
 
   /* Configure projects for major browsers */
@@ -104,7 +102,9 @@ export default defineConfig({
      * Playwright will re-use the local server if there is already a dev-server running.
      */
     command: process.env.CI ? 'npm run preview' : 'npm run dev',
-    port: process.env.CI ? 4173 : 5173,
+    port: process.env.CI ? 4173 : 3000,
     reuseExistingServer: !process.env.CI,
+    /* The dev server opens a browser tab on start; tests drive their own. */
+    env: { BROWSER: 'none' },
   },
 })
