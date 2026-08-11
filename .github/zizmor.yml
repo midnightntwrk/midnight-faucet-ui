@@ -1,0 +1,28 @@
+# Suppressions for zizmor, the workflow linter run by the Scan workflow.
+#
+# Every entry below records why the rule does not describe a real risk in this
+# repository. If a workflow named here changes shape, delete its entry and let
+# the finding come back rather than rewriting the rationale to fit.
+
+rules:
+  cache-poisoning:
+    ignore:
+      # Flagged on the three actions/setup-node steps that pass `cache: 'npm'`.
+      # zizmor reads ci.yml as a release workflow because it runs on pushes to
+      # release/*, which makes a poisoned npm cache a supply-chain risk to
+      # whatever the workflow publishes. ci.yml publishes nothing: it uploads
+      # dist/ and the test reports purely for inspection, and the two workflows
+      # that do publish -- release.yml and docker-build.yml -- check out and
+      # rebuild from source rather than consuming that artifact.
+      - ci.yml
+
+  dangerous-triggers:
+    ignore:
+      # Both workflows are triggered by workflow_run on CI. That trigger earns
+      # its reputation when a workflow checks out the pull request that set it
+      # off, running fork-authored code with the privileges of the base repo.
+      # Neither of these does: each gates on
+      # `github.event.workflow_run.conclusion == 'success'` and checks out its
+      # own ref, so no untrusted code reaches the write-scoped token.
+      - release.yml
+      - docker-build.yml
