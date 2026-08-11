@@ -10,6 +10,14 @@ lerna-debug.log*
 node_modules
 .DS_Store
 dist
+
+# This project installs with npm only. A stray `yarn`/`pnpm` run leaves these
+# behind, which breaks `npm run` scripts by emptying node_modules/.bin.
+yarn.lock
+pnpm-lock.yaml
+.yarn/
+.pnp.*
+
 dist-ssr
 coverage
 *.local
