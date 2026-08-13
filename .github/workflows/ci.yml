@@ -82,6 +82,8 @@ jobs:
         run: npm run build
         env:
           VITE_IS_LOCAL_BUILD: false
+          # CI checks the whole dropdown, so it builds the internal variant.
+          VITE_IS_INTERNAL: true
 
       - name: Verify build output
         run: |
@@ -126,6 +128,8 @@ jobs:
         run: npm run build
         env:
           VITE_IS_LOCAL_BUILD: false
+          # CI checks the whole dropdown, so it builds the internal variant.
+          VITE_IS_INTERNAL: true
 
       - name: Run end-to-end tests
         run: npm run test:e2e
