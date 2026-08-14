@@ -2,7 +2,7 @@
 import { ref, watchEffect } from "vue";
 import Dropdown from "./components/Dropdown.vue";
 import Input from "./components/Input.vue";
-import type { Network } from "./constants";
+import { DEFAULT_NETWORK, type Network } from "./constants";
 import midnightLogo from "./assets/midnight-logo.png";
 
 type Theme = "dark" | "light";
@@ -17,7 +17,7 @@ const storedTheme = (): Theme => {
   return stored === "light" || stored === "dark" ? stored : DEFAULT_THEME;
 };
 
-const network = ref<Network>("devnet");
+const network = ref<Network>(DEFAULT_NETWORK);
 const theme = ref<Theme>(storedTheme());
 
 watchEffect(() => {

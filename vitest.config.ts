@@ -7,6 +7,9 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'jsdom',
+      // Exercise the full network list by default; the specs that care about the
+      // public build stub this flag themselves.
+      env: { VITE_IS_INTERNAL: 'true' },
       exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
       coverage: {
