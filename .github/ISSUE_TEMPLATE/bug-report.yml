@@ -1,77 +1,53 @@
 name: Bug report
-description: Report incorrect or unexpected faucet behavior.
-title: "bug: "
-labels: ["status:untriaged", "component:faucet"]
+description: Report a bug or incorrect behaviour in midnight-faucet-ui
+title: "[Bug] "
+type: Bug
+labels:
+  - status:untriaged
+  - component:faucet
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thank you for reporting a bug. Do not use this form for security vulnerabilities; follow SECURITY.md instead.
-
   - type: input
     id: version
     attributes:
-      label: Version or commit
-      description: Which version, tag, or commit are you running?
-      placeholder: "v0.14.0 or commit SHA"
-    validations:
-      required: true
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      description: Engineering urgency; maintainers may adjust this during triage.
-      options:
-        - P3 - Medium
-        - P2 - High
-        - P1 - Critical
-        - P0 - Blocking
-        - P4 - Low
-      default: 0
+      label: Version affected
+      description: Release tag, deployed environment, or commit SHA where the bug occurs.
+      placeholder: e.g. v1.4.0 / preview / commit abc1234
     validations:
       required: true
 
   - type: input
     id: environment
     attributes:
-      label: Environment
-      description: Operating system, Node version, network, and relevant configuration.
-      placeholder: "macOS 15, Node 24.11.1, preview"
+      label: Browser & OS
+      description: Browser and version, operating system, and wallet extension if relevant.
+      placeholder: e.g. Chrome 141 on macOS 15, Lace 1.9
     validations:
       required: true
 
   - type: textarea
-    id: reproduce
+    id: steps
     attributes:
       label: Steps to reproduce
-      placeholder: |
-        1. Run `...`
-        2. Observe `...`
+      value: |
+        1.
+        2.
+        3.
+      description: If not reproducible, describe the steps as best you recall.
     validations:
       required: true
 
   - type: textarea
     id: actual
     attributes:
-      label: Actual behavior
-      description: Include relevant logs or screenshots after removing secrets.
+      label: Actual behaviour
+      description: The outcome you saw. Include console errors or screenshots, with secrets removed.
     validations:
       required: true
 
   - type: textarea
     id: expected
     attributes:
-      label: Expected behavior
+      label: Expected behaviour
+      description: What you expected to happen instead.
     validations:
       required: true
-
-  - type: checkboxes
-    id: checks
-    attributes:
-      label: Pre-flight checks
-      options:
-        - label: I searched existing issues and did not find a duplicate.
-          required: true
-        - label: This is not a security vulnerability.
-          required: true
