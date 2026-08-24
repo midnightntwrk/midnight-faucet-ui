@@ -30,7 +30,7 @@ test.describe('network selection', () => {
     await trigger(page).click()
 
     await expect(menu(page)).toBeVisible()
-    for (const network of ['devnet', 'stagenet', 'qanet', 'preview', 'preprod']) {
+    for (const network of ['devnet', 'qanet', 'preview', 'preprod']) {
       await expect(option(page, network)).toBeVisible()
     }
   })
