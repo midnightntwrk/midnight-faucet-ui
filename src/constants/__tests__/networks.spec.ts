@@ -3,6 +3,7 @@ import { NETWORKS, NETWORK_IDS, type Network } from "../networks";
 
 const ALL_NETWORKS = Object.keys(NETWORKS) as Network[];
 
+
 const INTERNAL_ONLY: Network[] = ["devnet", "qanet"];
 const PUBLIC_ONLY: Network[] = ["preview", "preprod"];
 
