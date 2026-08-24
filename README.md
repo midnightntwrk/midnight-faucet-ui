@@ -29,6 +29,21 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 npm install
 ```
 
+### Environment Variables
+
+These are read at build time, so each deployment needs its own build. Put them in
+`.env.local` for development, or in the build step's environment in CI.
+
+| Variable | Default | Effect |
+|---|---|---|
+| `VITE_IS_INTERNAL` | `false` | `true` adds the pre-release networks (`devnet`, `qanet`) to the dropdown. Leave it unset for a public deployment, which then offers only `preview` and `preprod`. |
+| `VITE_IS_LOCAL_BUILD` | `false` | `true` adds the loopback faucet (`local` → `localhost:5300`) to the dropdown. |
+| `VITE_TURNSTILE_SITE_KEY` | Cloudflare test key | The Turnstile site key to render the CAPTCHA with. |
+
+Both build flags default to the safer answer, so a build that forgets them ships
+the public dropdown rather than leaking a pre-release network. The dev and QA
+deployments are the ones that set `VITE_IS_INTERNAL=true`.
+
 ### Compile and Hot-Reload for Development
 
 ```sh

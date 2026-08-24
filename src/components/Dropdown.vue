@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import axios from "axios";
-import { OPTIONS, type Network, type Status } from "../constants";
+import { DEFAULT_NETWORK, OPTIONS, type Network, type Status } from "../constants";
 import { ROUTES, type HealthResponse, type ReadyResponse } from "../router/routes";
 
 const props = withDefaults(defineProps<{ modelValue?: Network }>(), {
-  modelValue: "devnet",
+  modelValue: () => DEFAULT_NETWORK,
 });
 const emit = defineEmits<(e: "update:modelValue", value: Network) => void>();
 
@@ -19,7 +19,6 @@ const optionId = (n: Network) => `dropdown-option-${n}`;
 const status = reactive<Record<Network, Status>>({
   local: "idle",
   devnet: "idle",
-  stagenet: 'idle',
   qanet: "idle",
   preview: "idle",
   preprod: "idle",
@@ -35,7 +34,6 @@ type ProbeResult<T> =
 const failureMessage = reactive<Record<Network, string | null>>({
   local: null,
   devnet: null,
-  stagenet: null,
   qanet: null,
   preview: null,
   preprod: null,
