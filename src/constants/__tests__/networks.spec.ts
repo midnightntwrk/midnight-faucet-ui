@@ -3,7 +3,8 @@ import { NETWORKS, NETWORK_IDS, type Network } from "../networks";
 
 const ALL_NETWORKS = Object.keys(NETWORKS) as Network[];
 
-const INTERNAL_ONLY: Network[] = ["devnet", "stagenet", "qanet"];
+
+const INTERNAL_ONLY: Network[] = ["devnet", "qanet"];
 const PUBLIC_ONLY: Network[] = ["preview", "preprod"];
 
 /**
@@ -27,7 +28,7 @@ afterEach(() => {
 
 describe("NETWORKS", () => {
   it("covers every network the app knows about", () => {
-    expect(ALL_NETWORKS).toEqual(["local", "devnet", "stagenet", "qanet", "preview", "preprod"]);
+    expect(ALL_NETWORKS).toEqual(["local", "devnet", "qanet", "preview", "preprod"]);
   });
 
   it("ends every base URL with a slash so route builders can append paths directly", () => {
