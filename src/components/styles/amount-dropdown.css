@@ -1,0 +1,41 @@
+.amount-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  font-family: inherit;
+}
+
+.label-text {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  text-transform: lowercase;
+}
+
+select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+select:hover,
+select:focus-visible {
+  border-color: var(--color-border-strong);
+  outline: none;
+}
+
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+option {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
