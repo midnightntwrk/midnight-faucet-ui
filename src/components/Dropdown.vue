@@ -19,7 +19,6 @@ const optionId = (n: Network) => `dropdown-option-${n}`;
 const status = reactive<Record<Network, Status>>({
   local: "idle",
   devnet: "idle",
-  stagenet: 'idle',
   qanet: "idle",
   preview: "idle",
   preprod: "idle",
@@ -35,7 +34,6 @@ type ProbeResult<T> =
 const failureMessage = reactive<Record<Network, string | null>>({
   local: null,
   devnet: null,
-  stagenet: null,
   qanet: null,
   preview: null,
   preprod: null,

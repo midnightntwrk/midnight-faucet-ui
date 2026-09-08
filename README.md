@@ -36,7 +36,7 @@ These are read at build time, so each deployment needs its own build. Put them i
 
 | Variable | Default | Effect |
 |---|---|---|
-| `VITE_IS_INTERNAL` | `false` | `true` adds the pre-release networks (`devnet`, `stagenet`, `qanet`) to the dropdown. Leave it unset for a public deployment, which then offers only `preview` and `preprod`. |
+| `VITE_IS_INTERNAL` | `false` | `true` adds the pre-release networks (`devnet`, `qanet`) to the dropdown. Leave it unset for a public deployment, which then offers only `preview` and `preprod`. |
 | `VITE_IS_LOCAL_BUILD` | `false` | `true` adds the loopback faucet (`local` → `localhost:5300`) to the dropdown. |
 | `VITE_TURNSTILE_SITE_KEY` | Cloudflare test key | The Turnstile site key to render the CAPTCHA with. |
 
