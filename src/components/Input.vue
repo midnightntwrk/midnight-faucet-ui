@@ -2,7 +2,8 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import axios, { isAxiosError } from "axios";
 import { ROUTES, type HealthResponse } from "../router/routes";
-import { TURNSTILE_SITE_KEY, TURNSTILE_TEST_SITE_KEY, type Network } from "../constants";
+import { TURNSTILE_SITE_KEY, TURNSTILE_TEST_SITE_KEY, type Network, DEFAULT_AMOUNT, type Amount } from "../constants";
+import AmountDropdown from "./AmountDropdown.vue";
 
 type TurnstileRenderOptions = {
   sitekey: string;
@@ -48,7 +49,8 @@ const transactionHash = ref<string | null>(null);
 
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 const POLL_INTERVAL_MS = 2000;
-const AMOUNT = "1000";
+
+const selectedAmount = ref<Amount>(DEFAULT_AMOUNT);
 
 const isTesting =
   typeof window !== "undefined" &&
@@ -164,7 +166,7 @@ const requestDrip = async () => {
   try {
     const { data } = await axios.post<DripResponse>(
       ROUTES.postDrip({ chain: props.network }),
-      { recipientAddress: trimmed, amount: AMOUNT },
+      { recipientAddress: trimmed, amount: String(selectedAmount.value) },
       {
         headers: {
           "Content-Type": "application/json",
@@ -262,6 +264,7 @@ onBeforeUnmount(() => {
       spellcheck="false"
       :disabled="submitting"
     />
+    <AmountDropdown v-model="selectedAmount" />
     <p v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</p>
     <p v-else-if="statusMessage" class="status-message" role="status">{{ statusMessage }}</p>
     <a
