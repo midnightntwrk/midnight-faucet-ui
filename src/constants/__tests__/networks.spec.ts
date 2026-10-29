@@ -69,9 +69,7 @@ describe("OPTIONS", () => {
 
   it("keeps the networks in their declared order", async () => {
     await expect(loadOptions("true")).resolves.toEqual(ALL_NETWORKS);
-    await expect(loadOptions("false")).resolves.toEqual(
-      ALL_NETWORKS.filter((n) => n !== "local"),
-    );
+    await expect(loadOptions("false")).resolves.toEqual(ALL_NETWORKS.filter((n) => n !== "local"));
   });
 });
 
