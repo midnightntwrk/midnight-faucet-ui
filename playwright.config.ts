@@ -104,7 +104,9 @@ export default defineConfig({
     command: process.env.CI ? 'npm run preview' : 'npm run dev',
     port: process.env.CI ? 4173 : 3000,
     reuseExistingServer: !process.env.CI,
-    /* The dev server opens a browser tab on start; tests drive their own. */
-    env: { BROWSER: 'none' },
+    /* The dev server opens a browser tab on start; tests drive their own. The
+     * specs exercise the whole dropdown, so the server serves the internal
+     * variant — the same choice CI makes when it builds. */
+    env: { BROWSER: 'none', VITE_IS_INTERNAL: 'true' },
   },
 })
