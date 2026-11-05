@@ -24,7 +24,7 @@
     "@babel/core": "^7.29.6"
   },
   "dependencies": {
-    "axios": "^1.20.0",
+    "axios": "^1.21.0",
     "pinia": "^4.0.3",
     "vue": "^3.5.42",
     "vue-turnstile": "^1.0.11"
